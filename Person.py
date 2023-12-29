@@ -1,5 +1,5 @@
 class Person:
-    def __init__(self, x_center, y_center, x_coor, y_coor, width, height, color):
+    def __init__(self, x_center, y_center, x_coor, y_coor, width, height, color, template):
         """
         Constructor of class Person.
 
@@ -17,6 +17,7 @@ class Person:
         self.width = width
         self.height = height
         self.color = color
+        self.template = template
 
     def __str__(self):
         return f"[color:{self.color}, center:{self.center}, coor:[{self.x_coor}, {self.y_coor}], width:{self.width}, height:{self.height}]"
@@ -26,3 +27,6 @@ class Person:
 
     def get_color(self):
         return self.color
+
+    def get_template(self):
+        return self.template
