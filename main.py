@@ -34,13 +34,16 @@ while True:
             else:
                 i = 0
                 for person in people[i]:
-                    distance_x = person.get_center()[0] - center[0]
-                    distance_y = person.get_center()[1] - center[1]
-                    if (-15 <= distance_x <= 15) and (-20 <= distance_y <= 20):
+                    distance_x = float(person.get_center()[0] - center[0])
+                    distance_y = float(person.get_center()[1] - center[1])
+                    print(distance_x)
+                    print(distance_y)
+                    print()
+                    if (-0.5 <= distance_x <= 0.5) and (-3.0 <= distance_y <= 3.0):
                         color = person.get_color()
                         person = Person(center[0], center[1], x, y, width, height, color)
                         frame_people.append(person)
-                    i += 1
+                i += 1
             rectangle = cv2.rectangle(frame, (x, y), (x + width, y + height), color, 2)  # Draw rectangle
     people.append(frame_people.copy())
     frame_people.clear()
@@ -51,6 +54,7 @@ while True:
 cv2.destroyAllWindows()  # closes all the windows opened with imshow
 video.release()  # releases all the resources used in the video processing
 
+# TODO error following people after a few frames
 # TODO track people
 # TODO different color in rectangles for each person
 # TODO useful
