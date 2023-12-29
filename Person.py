@@ -11,8 +11,7 @@ class Person:
         - width (int): Width of the rectangle
         - height (int): Height of the rectangle
         """
-        self.x_center = x_center
-        self.y_center = y_center
+        self.center = [x_center, y_center]
         self.x_coor = x_coor
         self.y_coor = y_coor
         self.width = width
@@ -20,8 +19,10 @@ class Person:
         self.color = color
 
     def __str__(self):
-        return f"[color:{self.color}, centro:[{self.x_center}, {self.y_center}], coor:[{self.x_coor}, {self.y_coor}], width:{self.width}, height:{self.height}]"
+        return f"[color:{self.color}, center:{self.center}, coor:[{self.x_coor}, {self.y_coor}], width:{self.width}, height:{self.height}]"
 
-    def introduce(self):
-        """Método para que la persona se presente."""
-        return f"Hola, me llamo {self.name}. Tengo {self.age} años y soy {self.occupation}."
+    def get_center(self):
+        return self.center
+
+    def get_color(self):
+        return self.color
