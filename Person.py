@@ -1,5 +1,5 @@
 class Person:
-    def __init__(self, x_center, y_center, x_coor, y_coor, width, height, color, template):
+    def __init__(self, x_center, y_center, x_coor, y_coor, width, height, color, trajectory=(0, 0)):
         """
         Constructor of class Person.
 
@@ -10,6 +10,7 @@ class Person:
         - y_coor (int): Y coordinate of the rectangle
         - width (int): Width of the rectangle
         - height (int): Height of the rectangle
+        - trajectory(tuple): Trajectory of the person
         """
         self.center = [x_center, y_center]
         self.x_coor = x_coor
@@ -17,7 +18,7 @@ class Person:
         self.width = width
         self.height = height
         self.color = color
-        self.template = template
+        self.trajectory = trajectory
 
     def __str__(self):
         return f"[color:{self.color}, center:{self.center}, coor:[{self.x_coor}, {self.y_coor}], width:{self.width}, height:{self.height}]"
@@ -28,5 +29,5 @@ class Person:
     def get_color(self):
         return self.color
 
-    def get_template(self):
-        return self.template
+    def get_trajectory(self):
+        return self.trajectory
