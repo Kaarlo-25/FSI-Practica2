@@ -69,19 +69,29 @@ class Person:
         """
 
         for person in Person.people:
+            x = int(person.center[0])
+            width = 200
+            y = int(person.center[1])
+            height = 200
+            x_start = max(0, x - width // 2)
+            y_start = max(0, y - height // 2)
+            x_end = min(frame.shape[1], x + width // 2)
+            y_end = min(frame.shape[0], y + height // 2)
+            roi = frame[y_start:y_end, x_start:x_end]
+            """
             x = int(person.center[0] - 25)
-            width = 60
+            width = 80
             y = int(person.center[1] + 25)
-            height = 60
+            height = 80
             roi = frame[y:(y + height), x:(x + width)]
-            cv2.imshow('ROI', roi)
-            cv2.imshow('template', person.template)
-            template_comparison = cv2.matchTemplate(roi, person.template, cv2.TM_CCOEFF_NORMED)
-            a, max_value, b, max_loc = cv2.minMaxLoc(template_comparison)
-            if max_value > 0.9:
+            """
+            template_comparison = cv2.matchTemplate(roi, person.template, cv2.TM_CCORR_NORMED)
+            min_value, max_value, min_loc, max_loc = cv2.minMaxLoc(template_comparison)
+            cv2.imshow("ROI", cv2.resize(roi, (400, 300)))
+            cv2.imshow("Template", cv2.resize(template, (200, 500)))
+            if max_value > 0.90:
                 person.x_coor = max_loc[0]
                 person.y_coor = max_loc[1]
-                person.template = template
+                #person.template = template
                 person.center = [(person.width/2) + max_loc[0], (person.height/2) + max_loc[1]]
                 return Person.people.index(person)
-        return None
