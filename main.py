@@ -5,7 +5,7 @@ import cv2
 body_detector = cv2.CascadeClassifier('full_body_detector.xml')
 video = cv2.VideoCapture("people_walking.mp4")
 
-i = 0
+current_frame = 1
 while True:
     exist_frame, frame = video.read()
     if not exist_frame:  # if there's not any frame exit the loop
@@ -24,38 +24,30 @@ while True:
         center = None
         template = None
 
-        if 20 < width < 55 and 35 < height < 100:
+        if 20 < width < 65 and 35 < height < 115:
             center = [(width / 2) + x, (height / 2) + y]
             template = frame[y:y + height, x:x + width]
-            if i == 0:
-                color = (random.randint(1, 255), random.randint(1, 255), random.randint(1, 255))
-                Person.people.append(Person(center, x, y, width, height, color, template))
-                ID = "Mierda"
+            if current_frame == 1:
+                ID = Person.create_person(center, x, y, width, height, template, current_frame)
 
             else:
-                coincidence = Person.same_person(template, frame, center, x, y)
+                coincidence = Person.same_person(template, frame, center, x, y, current_frame)
                 if coincidence is not None:
                     color = coincidence.color
                     ID = coincidence.ID
                 else:
-                    color = (random.randint(1, 255), random.randint(1, 255), random.randint(1, 255))
-                    Person.people.append(Person(center, x, y, width, height, color, template))
-                    ID = Person.people[-1].ID
+                    ID = Person.create_person(center, x, y, width, height, template, current_frame)
             rectangle = cv2.rectangle(rectangle_frame, (x, y), (x + width, y + height), color, 2)
             cv2.putText(rectangle_frame, f"{ID}", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-    cv2.imshow('frame', rectangle_frame)  # Shows the video in a new window
+            for person in Person.people:
+                cv2.circle(rectangle_frame, (int(person.center[0]), int(person.center[1])), 5, (0.0, 0.0, 255.0))
+    cv2.imshow('frame', rectangle_frame)
+    #print(i)
+    for person in Person.people:
+        if (current_frame - person.last_frame) >= 20:
+            Person.people.remove(person)
 
-    #for person in Person.people:
-
-        #person.is_update[0] == False and person.is_update[1] == 0
-
-        #if person.y_coor < 1 or person.y_coor + person.height == 599:
-            #Person.people.remove(person)
-        #if not person.is_update[0]:
-            #person.is_update[1] -= 1
-
-    i += 1
-    # escape button to exit the video
+    current_frame += 1
     k = cv2.waitKey(5) & 0xFF
     if k == 27:
         break

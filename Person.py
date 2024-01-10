@@ -1,4 +1,5 @@
 import cv2
+import random
 
 
 class Person:
@@ -6,7 +7,7 @@ class Person:
     people = []
 
     # Constructor
-    def __init__(self, center, x_coor, y_coor, width, height, color, template, is_update=[False, 2]):
+    def __init__(self, center, x_coor, y_coor, width, height, color, template, last_frame):
         """
         Constructor of class Person.
 
@@ -28,7 +29,7 @@ class Person:
         self.height = height
         self.color = color
         self.template = template
-        self.is_update = is_update
+        self.last_frame = last_frame
 
     def get_center(self):
         return self.center
@@ -54,19 +55,23 @@ class Person:
     def set_height(self, new_height):
         self.center = new_height
 
-    def update_coord(self, new_x_coor, new_y_coor, new_center):
+    def update_coord(self, new_x_coor, new_y_coor, new_center, current_frame):
         self.x_coor = new_x_coor
         self.y_coor = new_y_coor
         self.center = new_center
-        self.is_update[0] = True
-        self.is_update[1] = 3
+        self.last_frame = current_frame
 
     def __str__(self):
         return f"[ID:{self.ID}, color:{self.color}, center:{self.center}, coor:[{self.x_coor}, {self.y_coor}], width:{self.width}, height:{self.height}]"
 
     @classmethod
-    def same_person(cls, template, frame, center, x, y):
-        # min(Person.people, key=lambda person: (abs(person.get_center()[1] - center[1])))
+    def create_person(cls, center, x, y, width, height, template, current_frame):
+        color = (random.randint(1, 255), random.randint(1, 255), random.randint(1, 255))
+        Person.people.append(Person(center, x, y, width, height, color, template, current_frame))
+        return Person.people[-1].ID
+
+    @classmethod
+    def same_person(cls, template, frame, center, x, y, current_frame):
         """
         Objetivo: conseguir la persona del frame anterior
         Requisitos: template matching
@@ -77,25 +82,23 @@ class Person:
         """
         close_centers = []
         for person in Person.people:
-            if (abs(person.center[0] - center[0]) < 6 and abs(person.center[1] - center[1]) < 6) or (
-                    abs(person.x_coor - x) < 15 and abs(person.y_coor - y) < 15):
+            if (abs(person.center[0] - center[0]) < 25 and abs(person.center[1] - center[1]) < 25) or (
+                    abs(person.x_coor - x) < 45 and abs(person.y_coor - y) < 55):
                 close_centers.append(person)
-            if person.y_coor < 1 or person.y_coor + person.height == 599:
-                Person.people.remove(person)
 
         if len(close_centers) == 0:
             return None
         if len(close_centers) == 1:
-            close_centers[0].update_coord(x, y, center)
+            close_centers[0].update_coord(x, y, center, current_frame)
             return close_centers[0]
         else:
             person_found = min(close_centers, key=lambda person: (abs(person.get_center()[1] - center[1])))
+            person_found.update_coord(x, y, center, current_frame)
             return person_found
-
 
     """
         else:
-            for person in Person.people:
+            for person in close_centers:
                 center_x = int(center[0])
                 width = 200
                 center_y = int(center[1])
@@ -106,13 +109,15 @@ class Person:
                 y_end = min(frame.shape[0], y + height // 2)
                 roi = frame[y_start:y_end, x_start:x_end]
                 template_comparison = cv2.matchTemplate(roi, person.template, cv2.TM_SQDIFF_NORMED)
+                #cv2.imshow("frame", person.template)
+                cv2.imshow("frame", roi)
                 min_value, max_value, min_loc, max_loc = cv2.minMaxLoc(template_comparison)
-                cv2.imshow("ROI", cv2.resize(roi, (400, 300)))
-                cv2.imshow("Template", cv2.resize(person.template, (400, 300)))
                 if max_value > 0.90:
+                    print("yeah")
                     person.x_coor = x
                     person.y_coor = y
                     person.template = template
-                    person.center = [(person.width / 2) + x, (person.height / 2) + y]
-                    return Person.people.index(person)
-    """
+                    person.center = center
+                    person.update_coord(x, y, center)
+                    return person
+        """
