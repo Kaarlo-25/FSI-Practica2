@@ -93,12 +93,11 @@ class Person:
             close_centers[0].update_coord(x, y, center, current_frame)
             return close_centers[0]
 
-        else:
+        if 2 <= len(close_centers) <= 5:
             person_found = min(close_centers, key=lambda person: (abs(person.get_center()[1] - center[1])))
             person_found.update_coord(x, y, center, current_frame)
             return person_found
 
-    """
         else:
             for person in close_centers:
                 center_x = int(center[0])
@@ -122,4 +121,3 @@ class Person:
                     person.center = center
                     person.update_coord(x, y, center)
                     return person
-        """
