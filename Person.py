@@ -82,15 +82,17 @@ class Person:
         """
         close_centers = []
         for person in Person.people:
-            if (abs(person.center[0] - center[0]) < 25 and abs(person.center[1] - center[1]) < 25) or (
-                    abs(person.x_coor - x) < 45 and abs(person.y_coor - y) < 55):
+            if (abs(person.center[0] - center[0]) < 3 and abs(person.center[1] - center[1]) < 25) or (
+                    abs(person.x_coor - x) < 15 and abs(person.y_coor - y) < 55):
                 close_centers.append(person)
 
         if len(close_centers) == 0:
             return None
+
         if len(close_centers) == 1:
             close_centers[0].update_coord(x, y, center, current_frame)
             return close_centers[0]
+
         else:
             person_found = min(close_centers, key=lambda person: (abs(person.get_center()[1] - center[1])))
             person_found.update_coord(x, y, center, current_frame)
@@ -112,7 +114,7 @@ class Person:
                 #cv2.imshow("frame", person.template)
                 cv2.imshow("frame", roi)
                 min_value, max_value, min_loc, max_loc = cv2.minMaxLoc(template_comparison)
-                if max_value > 0.90:
+                if max_value > 0.95:
                     print("yeah")
                     person.x_coor = x
                     person.y_coor = y
