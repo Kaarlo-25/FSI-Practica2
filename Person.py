@@ -72,19 +72,14 @@ class Person:
 
     @classmethod
     def same_person(cls, template, frame, center, x, y, current_frame):
-        """
-        Objetivo: conseguir la persona del frame anterior
-        Requisitos: template matching
-        - for por cada persona de people:
-            - coges el centro de la persona
-            - haces la region de interes y el template matching en el frame actual
-            - la mayor coincidencia es la persona
-        """
+
         close_centers = []
         for person in Person.people:
             if (abs(person.center[0] - center[0]) < 3 and abs(person.center[1] - center[1]) < 25) or (
                     abs(person.x_coor - x) < 15 and abs(person.y_coor - y) < 55):
                 close_centers.append(person)
+            if (current_frame - person.last_frame) >= 20:
+                Person.people.remove(person)
 
         if len(close_centers) == 0:
             return None
@@ -100,24 +95,17 @@ class Person:
 
         else:
             for person in close_centers:
-                center_x = int(center[0])
-                width = 200
-                center_y = int(center[1])
-                height = 200
-                x_start = max(0, center_x - width // 2)
-                y_start = max(0, center_y - height // 2)
-                x_end = min(frame.shape[1], x + width // 2)
-                y_end = min(frame.shape[0], y + height // 2)
-                roi = frame[y_start:y_end, x_start:x_end]
+                x_start = person.x_coor - 40
+                y_start = person.y_coor - 40
+                if person.x_coor - 40 < 0:
+                    x_start = 0
+                if person.y_coor - 40 < 0:
+                    y_start = 0
+                roi = frame[y_start:person.y_coor + 100, x_start:person.x_coor + 100]
+                cv2.imshow("ROI", roi)
                 template_comparison = cv2.matchTemplate(roi, person.template, cv2.TM_SQDIFF_NORMED)
-                #cv2.imshow("frame", person.template)
-                cv2.imshow("frame", roi)
                 min_value, max_value, min_loc, max_loc = cv2.minMaxLoc(template_comparison)
                 if max_value > 0.95:
-                    print("yeah")
-                    person.x_coor = x
-                    person.y_coor = y
                     person.template = template
-                    person.center = center
                     person.update_coord(x, y, center)
                     return person
